@@ -150,7 +150,7 @@ const Services: React.FC = () => {
 
              {/* Headline */}
              <div className="relative">
-                <h2 className="text-6xl md:text-8xl lg:text-[7rem] font-display font-bold text-white leading-[0.85] tracking-tighter uppercase z-10 relative">
+                <h2 className="text-6xl md:text-8xl lg:text-[6rem] font-display font-bold text-white leading-[0.85] tracking-tighter uppercase z-10 relative">
                     From Design<br/>
                     <span 
                         className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600"
