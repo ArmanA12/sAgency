@@ -118,7 +118,7 @@ const App: React.FC = () => {
                         <div className="absolute -inset-10 bg-black/40 blur-3xl rounded-full pointer-events-none"></div>
                         
                         <h1 className="relative text-5xl md:text-7xl lg:text-[6rem] font-display font-semibold leading-[1.05] tracking-tight text-white animate-[fade-up_1s_ease-out_forwards]">
-                            UX/UI DESIGN & DEVELOPMENT<br />
+                            UX/UI DESIGN & SOFTWARE DEVELOPMENT<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFBDFF] via-[#F6A3FE] to-[#215BFE] drop-shadow-lg">
                                 FOR BUSINESS
                             </span>
