@@ -130,10 +130,6 @@ const App: React.FC = () => {
                          <div className="relative w-80 h-80 flex items-center justify-center">
                             
                             {/* Central Tesseract Core */}
-                            <div className="absolute inset-20 border border-[#215BFE]/30 border-t-[#215BFE] border-l-[#215BFE] animate-[spin_10s_linear_infinite]"></div>
-                            <div className="absolute inset-24 border border-[#F6A3FE]/30 border-b-[#F6A3FE] border-r-[#F6A3FE] animate-[spin_10s_linear_infinite_reverse] rotate-45"></div>
-                            <div className="absolute w-2 h-2 bg-white rounded-full animate-ping"></div>
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#215BFE] to-[#F6A3FE] opacity-10 blur-[80px] rounded-full"></div>
 
                             {/* Node 1: Security (Top Right) */}
                             <div className="absolute -top-6 -right-4 flex items-center gap-4 animate-[float_6s_ease-in-out_infinite] z-20">
