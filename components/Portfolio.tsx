@@ -171,7 +171,7 @@ const Portfolio: React.FC = () => {
         {/* 2. Editorial Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-24 pb-8 border-b border-white/10">
             <div>
-                <h2 className="text-6xl md:text-8xl font-display font-bold uppercase tracking-tighter leading-[0.9]">
+                <h2 className="text-6xl md:text-7xl font-display font-bold uppercase tracking-tighter leading-[0.9]">
                     <span className="text-white block">Selected</span>
                     <span 
                         className="block text-transparent bg-clip-text bg-gradient-to-r from-[#FFBDFF] to-[#215BFE]"
