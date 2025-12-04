@@ -99,13 +99,12 @@ const Contact: React.FC = () => {
     <section id="contact" className="relative min-h-screen bg-[#030305] overflow-hidden flex items-center justify-center py-20">
       
       {/* --- BACKGROUND LAYER --- */}
-      <div className="absolute inset-0 z-0">
+      {/* <div className="absolute inset-0 z-0">
         <Canvas camera={{ position: [0, 0, 14], fov: 35 }} dpr={[1, 2]}>
           <fog attach="fog" args={['#030305', 5, 30]} />
           
           <Environment preset="city" blur={0.8} />
           
-          {/* Cinematic Lighting for Glass */}
           <ambientLight intensity={0.5} />
           <spotLight position={[10, 10, 10]} angle={0.5} penumbra={1} intensity={20} color="#215BFE" />
           <spotLight position={[-10, -10, -10]} angle={0.5} penumbra={1} intensity={20} color="#F6A3FE" />
@@ -114,11 +113,10 @@ const Contact: React.FC = () => {
              <CrystalGlobe />
           </Float>
           
-          {/* Atmosphere */}
           <Stars radius={100} depth={50} count={2500} factor={4} saturation={0} fade speed={0.5} />
           <Sparkles count={50} scale={10} size={4} speed={0.4} opacity={0.5} color="#F6A3FE" />
         </Canvas>
-      </div>
+      </div> */}
 
       {/* Vignette Overlay for focus */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#030305_80%)] z-0 pointer-events-none"></div>
