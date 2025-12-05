@@ -11,8 +11,8 @@ import { PortfolioItem } from '../types';
 const projects: PortfolioItem[] = [
   {
     id: '1',
-    title: 'Neon DEX',
-    category: 'DeFi Platform',
+    title: 'BEE2BEE PLATEFORM',
+    category: 'FULL WEB APP',
     image: 'bg-gradient-to-br from-[#171741] via-[#215BFE] to-[#1255F1]',
     problem: 'The client needed a high-performance decentralized exchange that could handle high-frequency trading without sacrificing the user experience typically found in centralized exchanges.',
     solution: 'We engineered a custom liquidity aggregator on Solana with a WebGL-powered interface. The design focuses on data visualization and rapid execution speeds.',
@@ -20,8 +20,8 @@ const projects: PortfolioItem[] = [
   },
   {
     id: '2',
-    title: 'Aether NFT',
-    category: 'Marketplace',
+    title: 'AIFTP ONLINE',
+    category: 'Association',
     image: 'bg-gradient-to-bl from-[#40244B] via-[#5633BE] to-[#F6A3FE]',
     problem: 'Existing NFT marketplaces were cluttered and confusing for non-crypto natives. The goal was to build a sleek, gallery-like experience for premium digital art.',
     solution: 'We created a minimal, dark-mode focused marketplace using Next.js and Tailwind. Features include immersive 3D previews and a simplified wallet onboarding process.',
@@ -29,8 +29,8 @@ const projects: PortfolioItem[] = [
   },
   {
     id: '3',
-    title: 'Void Wallet',
-    category: 'Mobile App',
+    title: 'WOFX',
+    category: 'Website',
     image: 'bg-gradient-to-tr from-[#030305] via-[#211740] to-[#1255F1]',
     problem: 'Crypto wallets are notoriously difficult to use. Void wanted a mobile-first wallet that felt like a premium fintech app, focusing on security and ease of use.',
     solution: 'Developed a React Native application with biometric security and a "human-readable" transaction parser. The UI utilizes glassmorphism to create depth and hierarchy.',
@@ -38,8 +38,8 @@ const projects: PortfolioItem[] = [
   },
   {
     id: '4',
-    title: 'Pulse DAO',
-    category: 'Governance Dashboard',
+    title: 'COMMITTEE MANAGER',
+    category: 'Mobile APP',
     image: 'bg-gradient-to-br from-[#171741] via-[#FFBDFF] to-[#F6A3FE]',
     problem: 'DAO members struggled to keep track of proposals and treasury movements across multiple chains.',
     solution: 'Built a unified dashboard integrating data from Snapshot and Gnosis Safe. The interface uses color-coded metrics and real-time graphs to simplify complex governance data.',
@@ -47,8 +47,8 @@ const projects: PortfolioItem[] = [
   },
   {
     id: '5',
-    title: 'Cipher Chat',
-    category: 'Encrypted Messaging',
+    title: 'CHATTERNET',
+    category: 'Social Mobile App',
     image: 'bg-gradient-to-tr from-[#171741] via-[#5633BE] to-[#F6A3FE]',
     problem: 'Privacy-conscious users needed a secure communication tool that didn\'t compromise on UI/UX for security.',
     solution: 'Built a blockchain-based messaging app using Waku protocol. Features ephemeral messages, decentralized identity, and a zero-knowledge architecture.',

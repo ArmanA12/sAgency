@@ -6,6 +6,8 @@ interface AssetProject {
   id: number;
   title: string;
   category: string;
+  link:string,
+  download:string,
   images: string[];
 }
 
@@ -13,52 +15,63 @@ interface AssetProject {
 const allProjects: AssetProject[] = [
   {
     id: 1,
-    title: 'Neon NFT UI Kit',
-    category: 'Figma System',
+    title: 'VENSTYLER : FASHION',
+    category: 'Business Platefrom',
+    link:'https://www.venstyler.com/',
+    download:'https://github.com/ArmanA12/venstyler_v1_a',
     images: [
-      'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1620641788421-7f1c33b74078?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1642104704074-907c0698b98d?auto=format&fit=crop&q=80&w=800'
+      'https://res.cloudinary.com/dl2eivpdr/image/upload/v1764914453/Screenshot_2025-12-05_112716_fvwo5f.jpg',
+      'https://res.cloudinary.com/dl2eivpdr/image/upload/v1764914453/Screenshot_2025-12-05_112812_wwcvdl.jpg',
+      'https://res.cloudinary.com/dl2eivpdr/image/upload/v1764914453/Screenshot_2025-12-05_112853_wlksaa.jpg'
     ]
   },
   {
     id: 2,
-    title: 'Glassmorphism Lib',
-    category: 'React Components',
+    title: 'COMMITTEE MANAGER',
+    category: 'MOBILE APP',
+    link:'https://github.com/ArmanA12/CommitteeMobileAppFrontEnd',
+    download:'https://github.com/ArmanA12/CommitteeMobileAppFrontEnd',
     images: [
-      'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1618005198929-2e63e2634fa6?auto=format&fit=crop&q=80&w=800'
+      'https://raw.githubusercontent.com/ArmanA12/CommitteeMobileAppFrontEnd/master/Committee.png',
+      'https://raw.githubusercontent.com/ArmanA12/CommitteeMobileAppFrontEnd/master/Committee.png',
+      'https://raw.githubusercontent.com/ArmanA12/CommitteeMobileAppFrontEnd/master/Committee.png'
     ]
   },
   {
     id: 3,
-    title: 'Cyberpunk 3D Set',
-    category: 'Blender Assets',
+    title: 'CHATTERNET:SOCIAL',
+    category: 'Mobile App',
+    link:'https://github.com/ArmanA12/ChatterNetFMobile-App',
+    download:'https://github.com/ArmanA12/ChatterNetFMobile-App',
     images: [
-      'https://images.unsplash.com/photo-1615715757401-f30e7b27b912?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1535868463750-c78d9543614f?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800'
+      'https://github.com/ArmanA12/ChatterNetFMobile-App/raw/main/Group%201%20(9).png',
+      'https://github.com/ArmanA12/ChatterNetFMobile-App/raw/main/Group%201%20(9).png',
+      'https://github.com/ArmanA12/ChatterNetFMobile-App/raw/main/Group%201%20(9).png'
     ]
   },
   {
     id: 4,
-    title: 'DeFi Dashboard',
-    category: 'Web3 Template',
+    title: 'DEVELOPER PORTFOLIO',
+    category: 'WEBSITE',
+    link:'https://port-a-lac.vercel.app/',
+    download:'https://github.com/ArmanA12/Port-A',
     images: [
-      'https://images.unsplash.com/photo-1611974765270-ca1258634369?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1642543492481-44e81e3914a7?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1639322537228-ad7117a76437?auto=format&fit=crop&q=80&w=800'
+      'https://res.cloudinary.com/dl2eivpdr/image/upload/v1764914836/Screenshot_2025-12-05_113550_w0tdv1.jpg',
+      'https://res.cloudinary.com/dl2eivpdr/image/upload/v1764914835/Screenshot_2025-12-05_113616_kbx46z.jpg',
+      'https://res.cloudinary.com/dl2eivpdr/image/upload/v1764914835/Screenshot_2025-12-05_113656_on16nh.jpg',
+      
     ]
   },
   {
     id: 5,
-    title: 'WAGMI Hooks',
-    category: 'Code Snippets',
+    title: 'COLOURED PORTFOLIO',
+    category: 'WEBSITE',
+    link:'https://port-c-six.vercel.app/',
+    download:'https://github.com/finesse-mumbai/PortC',
     images: [
-      'https://images.unsplash.com/photo-1607705703571-c5a8695f18f6?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800'
+      'https://res.cloudinary.com/dl2eivpdr/image/upload/v1764915123/Screenshot_2025-12-05_114058_sckntp.jpg',
+      'https://res.cloudinary.com/dl2eivpdr/image/upload/v1764915123/Screenshot_2025-12-05_114118_kzzh8i.jpg',
+      'https://res.cloudinary.com/dl2eivpdr/image/upload/v1764915123/Screenshot_2025-12-05_114138_mj9clj.jpg'
     ]
   }
 ];
@@ -98,11 +111,11 @@ const ProjectRow = ({ project, index }: { project: AssetProject; index: number }
         <div className="relative z-10 flex items-center gap-4 w-full lg:w-auto">
           <button className="group/btn relative overflow-hidden px-8 py-4 bg-white/5 border border-white/10 text-white font-mono text-xs uppercase tracking-widest hover:border-white/40 transition-all duration-300 w-full lg:w-auto flex justify-center gap-2">
             <div className="absolute inset-0 bg-white/5 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
-            <span className="relative z-10 flex items-center gap-2">Live Preview <Eye size={14} /></span>
+            <span className="relative z-10 flex items-center gap-2"><a href={project.link} target="_blank" rel="noopener noreferrer">Live Preview</a> <Eye size={14} /></span>
           </button>
           
           <button className="group/btn relative overflow-hidden px-8 py-4 bg-[#215BFE] border border-[#215BFE] text-white font-mono text-xs uppercase tracking-widest hover:bg-[#1255F1] transition-all duration-300 w-full lg:w-auto flex justify-center gap-2 shadow-[0_0_20px_rgba(33,91,254,0.3)] hover:shadow-[0_0_30px_rgba(33,91,254,0.5)]">
-            <span className="relative z-10 flex items-center gap-2">Download <Download size={14} /></span>
+            <span className="relative z-10 flex items-center gap-2"><a href={project.download} target="_blank" rel="noopener noreferrer">Download</a> <Download size={14} /></span>
           </button>
         </div>
       </div>
@@ -183,7 +196,7 @@ const FreeDownloads: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 mb-20 flex flex-col md:flex-row items-end justify-between gap-8">
         <div>
             <div className="flex items-center gap-3 mb-6">
-                <div className="w-1 h-8 bg-[#215BFE]"></div>
+                {/* <div className="w-1 h-8 bg-[#215BFE]"></div> */}
                 <h2 className="text-6xl md:text-8xl font-display font-bold text-white uppercase tracking-tighter leading-[0.9]">
                     Open Source <br/>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#215BFE] to-[#F6A3FE] opacity-80">Assets</span>

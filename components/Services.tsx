@@ -173,7 +173,7 @@ const Services: React.FC = () => {
                     </p>
                 </div>
                 <button className="hidden md:flex items-center gap-3 px-8 py-4 border border-white/10 rounded-full text-white hover:bg-white hover:text-black hover:border-white transition-all duration-300 group">
-                    <span className="uppercase tracking-widest text-xs font-bold">Book a Strategy Call</span>
+                    <a href="tel:+917091554628" target="_blank" rel="noopener noreferrer"><span className="uppercase tracking-widest text-xs font-bold">Book a Strategy Call</span></a>
                     <ArrowUpRight size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </button>
              </div>

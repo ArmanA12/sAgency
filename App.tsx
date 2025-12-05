@@ -208,7 +208,7 @@ const App: React.FC = () => {
 
                             {/* Links */}
                             <nav className="hidden md:flex items-center gap-8 text-xs font-medium text-gray-400 uppercase tracking-widest">
-                                {['About us', 'Portfolio', 'Our stats'].map((link) => (
+                                {['About us', 'Portfolio', 'Templates'].map((link) => (
                                     <a key={link} href={`#${link.toLowerCase().replace(' ', '-')}`} className="hover:text-white hover:text-[#F6A3FE] transition-colors relative group">
                                         {link}
                                         <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#F6A3FE] group-hover:w-full transition-all duration-300"></span>
@@ -300,10 +300,10 @@ const App: React.FC = () => {
 
               <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-white/5">
                   {[
-                      { label: 'Years Experience', value: '08', gradient: 'from-[#FFBDFF] to-[#F6A3FE]', icon: Activity },
-                      { label: 'Projects Delivered', value: '150+', gradient: 'from-[#F6A3FE] to-[#215BFE]', icon: Database },
-                      { label: 'Team Members', value: '24', gradient: 'from-[#215BFE] to-[#1255F1]', icon: Code2 },
-                      { label: 'Global Clients', value: '40+', gradient: 'from-[#1255F1] to-[#5633BE]', icon: Globe },
+                      { label: 'Years Experience', value: '04', gradient: 'from-[#FFBDFF] to-[#F6A3FE]', icon: Activity },
+                      { label: 'Projects Delivered', value: '15+', gradient: 'from-[#F6A3FE] to-[#215BFE]', icon: Database },
+                      { label: 'Team Members', value: '4', gradient: 'from-[#215BFE] to-[#1255F1]', icon: Code2 },
+                      { label: 'Global Clients', value: '11+', gradient: 'from-[#1255F1] to-[#5633BE]', icon: Globe },
                   ].map((stat, idx) => (
                       <div key={idx} className="group relative p-8 md:p-12 lg:p-16 flex flex-col items-center justify-center overflow-hidden transition-all duration-500 hover:bg-[#171741]/20">
                           
