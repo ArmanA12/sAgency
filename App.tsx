@@ -203,7 +203,7 @@ const App: React.FC = () => {
                             {/* Logo */}
                             <div className="flex items-center gap-3">
                                 <div className="bg-white text-black font-extrabold px-2 py-0.5 text-xl rounded-sm">X</div>
-                                <span className="font-bold tracking-[0.2em] text-white text-sm">METHOD</span>
+                                <span className="font-bold tracking-[0.2em] text-white text-sm">A2TECH</span>
                             </div>
 
                             {/* Links */}
