@@ -124,7 +124,7 @@ const App: React.FC = () => {
                                 {/* Glow Backdrop */}
                                 <div className="absolute -inset-10 bg-black/40 blur-3xl rounded-full pointer-events-none"></div>
 
-                                <h1 className="relative text-5xl md:text-7xl lg:text-[6rem] font-display font-semibold leading-[1.05] tracking-tight text-white animate-[fade-up_1s_ease-out_forwards]">
+                                <h1 className="relative text-4xl md:text-7xl lg:text-[6rem] font-display font-semibold leading-[1.05] tracking-tight text-white animate-[fade-up_1s_ease-out_forwards]">
                                     UX/UI DESIGN & SOFTWARE DEVELOPMENT<br />
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFBDFF] via-[#F6A3FE] to-[#215BFE] drop-shadow-lg">
                                         FOR BUSINESS
@@ -208,7 +208,7 @@ const App: React.FC = () => {
                                 {/* Left: Logo & Nav Links */}
                                 <div className="flex items-center gap-8 md:gap-12 w-full md:w-auto justify-between md:justify-start">
                                     {/* Logo */}
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 hidden md:flex">
                                         <div className="bg-white text-black font-extrabold px-2 py-0.5 text-xl rounded-sm">X</div>
                                         <span className="font-bold tracking-[0.2em] text-white text-sm">A2TECH</span>
                                     </div>
@@ -226,7 +226,7 @@ const App: React.FC = () => {
 
                                 {/* Right: Actions */}
                                 <div className="flex items-center gap-6">
-                                    <div className="text-[10px] font-bold text-gray-500 flex flex-col items-end leading-tight tracking-widest">
+                                    <div className="text-[10px] font-bold text-gray-500 hidden md:flex flex-col items-end leading-tight tracking-widest">
                                         <span className="text-white">EN ▲</span>
                                         <span className="hover:text-white cursor-pointer transition-colors">DE</span>
                                     </div>
