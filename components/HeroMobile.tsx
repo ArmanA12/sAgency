@@ -1,90 +1,120 @@
 import React, { useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, PresentationControls, Environment, ContactShadows, Sparkles, Stars, PerformanceMonitor, Icosahedron } from '@react-three/drei';
+import { Float, PresentationControls, Environment, ContactShadows, Stars, PerformanceMonitor, Octahedron, Box } from '@react-three/drei';
 import * as THREE from 'three';
 
 const PALETTE = {
-  deepViolet: '#211740',
-  neonPink: '#F6A3FE',
-  royalPurple: '#5633BE',
-  softPink: '#FFBDFF',
-  neonBlue: '#215BFE',
-  navy: '#171741',
-  darkPurple: '#40244B',
-  deepBlue: '#1255F1',
-  electricCyan: '#00FFFF'
+  voidBlack: '#080808', // Darker black for better contrast
+  neonCyan: '#00F0FF',  // Cyberpunk Cyan
+  neonPurple: '#BD00FF', // Cyberpunk Purple
+  deepBlue: '#001eff',
+  white: '#ffffff'
 };
 
-// --- NEW CENTRAL OBJECT: Geometric Data Artifact ---
-// Premium look achieved via layering metal and glowing wireframes. very low poly.
-const GeometricArtifact = ({ scale = 1 }: { scale?: number }) => {
-  const coreRef = useRef<THREE.Mesh>(null);
-  const cageRef = useRef<THREE.Mesh>(null);
-  const innerLightRef = useRef<THREE.PointLight>(null);
+// --- THE DIAMOND HYPER-CORE ---
+// A diamond shape (Octahedron) inside a spinning containment cube.
+// Simple geometry, complex motion.
+const HyperCore = ({ scale = 1 }: { scale?: number }) => {
+  const diamondRef = useRef<THREE.Mesh>(null);
+  const cubeRef = useRef<THREE.Mesh>(null);
+  const ringRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
       const t = state.clock.getElapsedTime();
-      if (coreRef.current && cageRef.current && innerLightRef.current) {
-          // Core rotates slowly on multiple axes
-          coreRef.current.rotation.x = t * 0.2;
-          coreRef.current.rotation.y = t * 0.15;
-          
-          // Cage rotates faster and slightly off-axis for dynamic effect
-          cageRef.current.rotation.x = t * 0.25;
-          cageRef.current.rotation.z = -t * 0.1;
-          
-          // Subtle pulsing light
-          innerLightRef.current.intensity = 15 + Math.sin(t * 2) * 5;
+      if (diamondRef.current && cubeRef.current && ringRef.current) {
+          // 1. Diamond floats slowly, feels heavy
+          diamondRef.current.rotation.y = t * 0.2;
+          diamondRef.current.rotation.x = Math.sin(t * 0.5) * 0.1;
+
+          // 2. Cube cage spins fast and dynamic
+          cubeRef.current.rotation.x = t * 0.3;
+          cubeRef.current.rotation.y = t * 0.4;
+          cubeRef.current.rotation.z = Math.sin(t * 0.2) * 0.2;
+
+          // 3. Outer ring acts as a gyroscope
+          ringRef.current.rotation.x = -t * 0.2;
+          ringRef.current.rotation.z = t * 0.1;
       }
   });
 
   return (
     <group scale={scale}>
-      {/* 1. The Solid Core: Dark, highly reflective faceted metal */}
-      {/* args=[radius, detail] -> detail=0 gives a sharp faceted jewel look */}
-      <Icosahedron ref={coreRef} args={[1, 0]}>
+      {/* A. THE CORE: Octahedron (Diamond) 
+         Using flatShading + high metalness creates the "Premium Jewel" look 
+      */}
+      <Octahedron ref={diamondRef} args={[1, 0]}>
         <meshStandardMaterial 
-            color={PALETTE.deepBlue}
-            roughness={0.05} // Almost mirror-like finish
-            metalness={0.95} // Very metallic to catch environment reflections
-            envMapIntensity={1.5} // Boost reflections
-            flatShading={true} // Emphasize the facets
+            color="#1a1a1a"
+            roughness={0.1}
+            metalness={1} // Full chrome
+            envMapIntensity={2} // Maximize reflections
+            flatShading={true} // Essential for the diamond look
         />
-      </Icosahedron>
+      </Octahedron>
 
-      {/* 2. The Outer Cage: Glowing Neon Wireframe overlay */}
-      <Icosahedron ref={cageRef} args={[1.05, 1]} scale={1.1}>
+      {/* B. THE CAGE: Wireframe Box 
+         toneMapped={false} makes the color glow without bloom
+      */}
+      <Box ref={cubeRef} args={[1.5, 1.5, 1.5]}>
         <meshBasicMaterial 
-            color={PALETTE.neonPink}
-            wireframe={true}
+            color={PALETTE.neonCyan}
+            wireframe
             transparent
-            opacity={0.6}
-            toneMapped={false} // Ensures color is sear-bright neon
+            opacity={0.15} // Subtle cage
+            toneMapped={false} 
         />
-      </Icosahedron>
+      </Box>
+
+      {/* C. THE HIGHLIGHT: Outer Glowing Edges 
+         A second, slightly larger Octahedron just for the neon edges
+      */}
+      <Octahedron args={[1.02, 0]}>
+         <meshBasicMaterial 
+            color={PALETTE.neonPurple} 
+            wireframe 
+            transparent 
+            opacity={0.8}
+            toneMapped={false} 
+         />
+      </Octahedron>
       
-      {/* 3. Inner Core Light to make it radiate from within */}
-      <pointLight ref={innerLightRef} position={[0,0,0]} intensity={20} color={PALETTE.electricCyan} distance={4} decay={2} />
+      {/* Internal light to simulate energy core */}
+      <pointLight position={[0,0,0]} intensity={10} color={PALETTE.deepBlue} distance={3} />
     </group>
   );
 };
 
-// --- Optimized Background ---
-const SimpleBackgroundMesh = () => {
-    const ref = useRef<THREE.Mesh>(null);
+// --- PARTICLE FIELD ---
+// Replaces heavy Sparkles with simple low-poly geometry
+const DataParticles = () => {
+    const count = 20;
+    // Memoize random positions so they don't recalculate on render
+    const positions = useMemo(() => {
+        return new Array(count).fill(0).map(() => ({
+            x: (Math.random() - 0.5) * 10,
+            y: (Math.random() - 0.5) * 10,
+            z: (Math.random() - 0.5) * 5,
+            scale: Math.random() * 0.05
+        }));
+    }, []);
+
+    const group = useRef<THREE.Group>(null);
     useFrame((state) => {
-        if(ref.current) {
-           ref.current.rotation.z = state.clock.elapsedTime * 0.02;
-           ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.1;
+        if (group.current) {
+            group.current.rotation.y = state.clock.elapsedTime * 0.05;
         }
-    });
-    // Using a torus knot wireframe in the far background looks more complex/premium than a sphere
+    })
+
     return (
-        <mesh ref={ref} position={[0, 0, -20]} scale={[5, 5, 5]}>
-            <torusKnotGeometry args={[3, 0.1, 64, 8, 2, 3]} />
-            <meshBasicMaterial color={PALETTE.deepViolet} wireframe transparent opacity={0.05} />
-        </mesh>
-    );
+        <group ref={group}>
+            {positions.map((pos, i) => (
+                <mesh key={i} position={[pos.x, pos.y, pos.z]}>
+                    <octahedronGeometry args={[pos.scale, 0]} />
+                    <meshBasicMaterial color={PALETTE.neonCyan} transparent opacity={0.4} />
+                </mesh>
+            ))}
+        </group>
+    )
 }
 
 
@@ -97,11 +127,10 @@ const HeroMobile: React.FC = () => {
     <div className="absolute inset-0 z-0 bg-[#030305]">
       <Canvas 
         dpr={dpr} 
-        // Wider FOV makes the central object feel more imposing
-        camera={{ position: [0, 0, 15], fov: 50 }} 
+        camera={{ position: [0, 0, 14], fov: 45 }} 
         gl={{ 
             antialias: false, 
-            alpha: false,
+            alpha: false, // Opaque background is faster
             powerPreference: "high-performance",
             stencil: false,
             depth: true,
@@ -110,38 +139,38 @@ const HeroMobile: React.FC = () => {
         <PerformanceMonitor onDecline={() => setDpr(0.75)} onIncline={() => setDpr(1.5)} />
         
         <color attach="background" args={['#030305']} />
-        {/* City preset gives great urban reflections on the metal core */}
-        <Environment preset="city" blur={1} background={false} />
         
-        {/* Dramatic Rim Lighting defines the edges of the facets */}
-        <spotLight position={[-12, 15, 10]} angle={0.3} intensity={100} color={PALETTE.neonBlue} penumbra={1} />
-        <spotLight position={[12, -10, 10]} angle={0.3} intensity={100} color={PALETTE.neonPink} penumbra={1} />
-        <pointLight position={[0, 5, -5]} intensity={10} color={PALETTE.royalPurple} />
-
-        <Stars radius={80} depth={50} count={500} factor={4} saturation={0} fade speed={0.3} />
-        <Sparkles count={30} scale={15} size={4} speed={0.2} opacity={0.4} color={PALETTE.neonBlue} />
-        <Sparkles count={20} scale={15} size={2} speed={0.3} opacity={0.3} color={PALETTE.neonPink} />
+        {/* OPTIMIZATION: Low resolution environment map. 
+            256x256 is plenty for abstract reflections and saves MBs of memory. */}
+        <Environment preset="city" resolution={256} blur={0.8} background={false} />
         
-        <SimpleBackgroundMesh />
+        {/* Cinematic Lighting Setup */}
+        <spotLight position={[-10, 15, 10]} angle={0.3} intensity={80} color={PALETTE.neonCyan} penumbra={1} />
+        <spotLight position={[10, -10, 10]} angle={0.3} intensity={80} color={PALETTE.neonPurple} penumbra={1} />
+        
+        {/* Minimal Stars (Reduced count for mobile) */}
+        <Stars radius={60} depth={40} count={400} factor={3} saturation={0} fade speed={0.5} />
+        
+        <DataParticles />
 
         <PresentationControls
           global
           zoom={0.7}
           rotation={[0, 0, 0]}
-          polar={[-Math.PI / 6, Math.PI / 6]}
-          azimuth={[-Math.PI / 6, Math.PI / 6]}
+          polar={[-Math.PI / 4, Math.PI / 4]}
+          azimuth={[-Math.PI / 4, Math.PI / 4]}
           config={{ mass: 1, tension: 200, friction: 30 }}
           snap={true}
         >
-          <Float speed={2.5} rotationIntensity={0.5} floatIntensity={0.8} floatingRange={[-0.2, 0.2]}>
-            <group position={[0, 0.5, 0]}>
-               {/* THE NEW GEOMETRIC ARTIFACT */}
-               <GeometricArtifact scale={2.5} />
+          <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5} floatingRange={[-0.2, 0.2]}>
+            <group position={[0, 0, 0]}>
+               <HyperCore scale={2.5} />
             </group>
           </Float>
         </PresentationControls>
 
-        <ContactShadows position={[0, -4, 0]} opacity={0.7} scale={18} blur={2.5} far={5} color={PALETTE.deepBlue} frames={1} />
+        {/* OPTIMIZATION: resolution=256 reduces shadow map size significantly */}
+        <ContactShadows resolution={256} position={[0, -4.5, 0]} opacity={0.6} scale={15} blur={2} far={4} color={PALETTE.neonPurple} frames={1} />
       </Canvas>
     </div>
   );
