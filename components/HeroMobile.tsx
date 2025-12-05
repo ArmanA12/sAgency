@@ -1,6 +1,6 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, PresentationControls, Environment, RoundedBox, MeshTransmissionMaterial, ContactShadows, Sparkles, Stars, PerformanceMonitor } from '@react-three/drei';
+import { Float, PresentationControls, Environment, ContactShadows, Sparkles, Stars, PerformanceMonitor, TorusKnot } from '@react-three/drei';
 import * as THREE from 'three';
 
 const PALETTE = {
@@ -14,145 +14,129 @@ const PALETTE = {
   deepBlue: '#1255F1',
 };
 
-// --- LOCAL COMPONENTS (Optimized for Mobile) ---
+// --- NEW: The "Neon Artifact" (Replaces the heavy glass cube) ---
+// This uses cheap standard materials but looks premium due to lighting and wireframe overlay.
+const NeonArtifact = ({ scale = 1 }: { scale?: number }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const wireframeRef = useRef<THREE.Mesh>(null);
 
-const BackgroundWireframe = () => {
-  const mesh = useRef<THREE.Mesh>(null);
   useFrame((state) => {
-    if (mesh.current) {
-        mesh.current.rotation.y = state.clock.getElapsedTime() * 0.05;
-        mesh.current.rotation.z = state.clock.getElapsedTime() * 0.02;
-    }
+      const t = state.clock.getElapsedTime();
+      if (meshRef.current && wireframeRef.current) {
+          // Slow, complex rotation
+          meshRef.current.rotation.x = t * 0.15;
+          meshRef.current.rotation.y = t * 0.1;
+          // Wireframe rotates slightly differently for a dynamic effect
+          wireframeRef.current.rotation.x = t * 0.15;
+          wireframeRef.current.rotation.y = t * 0.1;
+          wireframeRef.current.rotation.z = Math.sin(t * 0.5) * 0.1;
+      }
   });
 
   return (
-    <mesh ref={mesh} position={[0, 0, -10]} scale={[1.5, 1.5, 1.5]}>
-        {/* Lowest detail geometry for mobile background */}
-        <icosahedronGeometry args={[10, 0]} />
-        <meshBasicMaterial color={PALETTE.navy} wireframe transparent opacity={0.05} />
-    </mesh>
-  )
-}
-
-const CrystalCube = ({ position, rotation, coreColor, glassColor, rimColor, scale = 1 }: { position: [number, number, number], rotation: [number, number, number], coreColor: string, glassColor: string, rimColor: string, scale?: number }) => {
-  const groupRef = useRef<THREE.Group>(null);
-  const materialRef = useRef<THREE.MeshBasicMaterial>(null);
-  const lightRef = useRef<THREE.PointLight>(null);
-  
-  // Memoize args to prevent garbage collection on every render
-  const boxArgs: [number, number, number] = useMemo(() => [2.5, 2.5, 2.5], []);
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (groupRef.current) {
-       groupRef.current.rotation.x = rotation[0] + Math.sin(t * 0.2) * 0.05;
-       groupRef.current.rotation.y = rotation[1] + t * 0.08;
-    }
-  });
-
-  return (
-    <group position={position} ref={groupRef} scale={scale}>
-      <RoundedBox 
-        args={boxArgs} 
-        radius={0.05} 
-        smoothness={2} // Mobile Optimization: Low smoothness (4 -> 2)
-      >
-        <MeshTransmissionMaterial
-            backside
-            samples={3} // Mobile Optimization: Very low samples (4 -> 3)
-            resolution={256} // Mobile Optimization: Low resolution buffer (512 -> 256)
-            thickness={2}
-            chromaticAberration={0.5} // Reduced for performance
-            anisotropy={0} // Disabled for mobile
-            distortion={0.4}
-            distortionScale={0.4}
-            temporalDistortion={0.1}
-            iridescence={1}
-            iridescenceIOR={1.4}
-            iridescenceThicknessRange={[0, 1400]}
-            clearcoat={1}
-            roughness={0.05}
-            metalness={0.2}
-            color={glassColor}
-            attenuationDistance={3}
-            attenuationColor={coreColor}
-            background={new THREE.Color('#030305')}
-            ior={2.4}
+    <group scale={scale}>
+      {/* 1. The Solid Core: Dark reflective metal */}
+      <TorusKnot ref={meshRef} args={[1, 0.3, 128, 16]}>
+         {/* MeshStandardMaterial is much cheaper than Transmission */}
+        <meshStandardMaterial 
+            color={PALETTE.deepViolet}
+            roughness={0.1} // Very smooth
+            metalness={0.8} // Highly metallic to reflect the neon lights
+            envMapIntensity={1}
         />
-      </RoundedBox>
+      </TorusKnot>
+
+      {/* 2. The Glowing Wireframe Overlay */}
+      <TorusKnot ref={wireframeRef} args={[1.02, 0.32, 128, 16]}>
+        <meshBasicMaterial 
+            color={PALETTE.neonPink} // The main glow color
+            wireframe={true}
+            transparent
+            opacity={0.4}
+            toneMapped={false} // Makes the color sear bright
+        />
+      </TorusKnot>
       
-      {/* Wireframe overlay */}
-      <mesh scale={[0.99, 0.99, 0.99]}>
-         <boxGeometry args={boxArgs} />
-         <meshBasicMaterial ref={materialRef} color={rimColor} wireframe transparent opacity={0.2} />
-      </mesh>
-      
-      {/* Inner Glow */}
-      <pointLight ref={lightRef} position={[0, 0, 0]} intensity={40} color={coreColor} distance={5} decay={2} />
+      {/* Inner light to make the center pop */}
+      <pointLight position={[0,0,0]} intensity={15} color={PALETTE.neonBlue} distance={3} />
     </group>
   );
 };
 
+// --- Optimized Background ---
+const SimpleBackgroundMesh = () => {
+    const ref = useRef<THREE.Mesh>(null);
+    useFrame((state) => {
+        if(ref.current) ref.current.rotation.z = state.clock.elapsedTime * 0.01;
+    });
+    return (
+        <mesh ref={ref} position={[0, 0, -15]} scale={[2, 2, 2]}>
+            {/* Lowest detail geometry (detail = 0) */}
+            <icosahedronGeometry args={[10, 0]} /> 
+            <meshBasicMaterial color={PALETTE.deepBlue} wireframe transparent opacity={0.03} />
+        </mesh>
+    );
+}
+
+
 // --- MAIN MOBILE COMPONENT ---
 
 const HeroMobile: React.FC = () => {
-  // Mobile usually needs lower DPR to save battery
+  // Start at a lower DPR for mobile by default
   const [dpr, setDpr] = useState(1); 
 
   return (
     <div className="absolute inset-0 z-0 bg-[#030305]">
       <Canvas 
         dpr={dpr} 
-        camera={{ position: [0, 0, 18], fov: 35 }} // Slightly wider FOV for vertical screens
+        // Wider FOV to make the object look grander on small screens
+        camera={{ position: [0, 0, 16], fov: 45 }} 
         gl={{ 
-            toneMapping: THREE.ACESFilmicToneMapping, 
-            toneMappingExposure: 1.8,
-            antialias: false,
+            antialias: false, // Disable AA for performance
             alpha: false,
-            powerPreference: "high-performance"
+            powerPreference: "high-performance",
+            stencil: false, // Disable stencil buffer
+            depth: true, // Keep depth buffer
         }}
       >
-        <PerformanceMonitor onDecline={() => setDpr(0.7)} onIncline={() => setDpr(1.2)} />
+        {/* Aggressive performance monitoring for mobile */}
+        <PerformanceMonitor onDecline={() => setDpr(0.75)} onIncline={() => setDpr(1.5)} />
         
         <color attach="background" args={['#030305']} />
-        <Environment preset="night" blur={0.8} />
+        {/* Use a cheaper, blurry environment map for reflections */}
+        <Environment preset="city" blur={1} background={false} />
         
-        {/* Lights (Keep simple for mobile) */}
-        <spotLight position={[-15, 15, 10]} angle={0.4} penumbra={1} intensity={50} color={PALETTE.neonBlue} />
-        <spotLight position={[15, -10, 10]} angle={0.4} penumbra={1} intensity={50} color={PALETTE.neonPink} />
-        <pointLight position={[0, 10, 5]} intensity={10} color="white" />
+        {/* Strong Rim Lights to hit the metallic surface */}
+        <spotLight position={[-10, 15, 10]} angle={0.5} intensity={80} color={PALETTE.neonBlue} />
+        <spotLight position={[10, -10, 10]} angle={0.5} intensity={80} color={PALETTE.neonPink} />
+        {/* Fill light */}
+        <pointLight position={[0, 5, -5]} intensity={20} color={PALETTE.royalPurple} />
 
-        {/* Reduced particle count for mobile CPU */}
-        <Stars radius={100} depth={50} count={800} factor={4} saturation={0} fade speed={0.5} />
-        <Sparkles count={40} scale={12} size={3} speed={0.4} opacity={0.5} color={PALETTE.softPink} />
+        {/* Significantly reduced particle counts */}
+        <Stars radius={80} depth={50} count={400} factor={4} saturation={0} fade speed={0.3} />
+        <Sparkles count={25} scale={10} size={4} speed={0.2} opacity={0.4} color={PALETTE.neonBlue} />
         
-        <BackgroundWireframe />
+        <SimpleBackgroundMesh />
 
         <PresentationControls
           global
-          zoom={0.8}
+          zoom={0.7}
           rotation={[0, 0, 0]}
-          polar={[-Math.PI / 16, Math.PI / 16]}
-          azimuth={[-Math.PI / 16, Math.PI / 16]}
-          config={{ mass: 2, tension: 400 }}
+          polar={[-Math.PI / 8, Math.PI / 8]} // Limit vertical drag
+          azimuth={[-Math.PI / 8, Math.PI / 8]} // Limit horizontal drag
+          config={{ mass: 1, tension: 170, friction: 26 }} // Snappier feel
           snap={true}
         >
-          <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
-            <group position={[0, -1, 0]}>
-               {/* ONLY ONE CUBE - Centered and slightly larger */}
-               <CrystalCube
-                  position={[0, 0, 0]}
-                  rotation={[Math.PI / 8, Math.PI / 4, 0]}
-                  coreColor={PALETTE.royalPurple}
-                  glassColor="#e0c0ff"
-                  rimColor={PALETTE.neonPink}
-                  scale={1.3} // Increased scale for mobile visibility
-               />
+          <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+            <group position={[0, -0.5, 0]}>
+               {/* THE NEW OBJECT */}
+               <NeonArtifact scale={2.2} />
             </group>
           </Float>
         </PresentationControls>
 
-        <ContactShadows position={[0, -4, 0]} opacity={0.5} scale={20} blur={3} far={4} color={PALETTE.navy} frames={1} />
+        {/* Cheaper fake shadow */}
+        <ContactShadows position={[0, -4.5, 0]} opacity={0.6} scale={15} blur={2.5} far={4} color={PALETTE.deepBlue} frames={1} />
       </Canvas>
     </div>
   );
