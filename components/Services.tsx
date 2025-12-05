@@ -155,7 +155,7 @@ const Services: React.FC = () => {
                     <span 
                         className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600"
                         style={{ WebkitTextStroke: '1px rgba(255, 255, 255, 0)' }}
-                    >To Development</span>
+                    > Development</span>
                 </h2>
                 
                 {/* Decorative Blur behind text */}
