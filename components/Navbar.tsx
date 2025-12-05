@@ -4,7 +4,8 @@ import { Menu, X, ArrowUpRight } from 'lucide-react';
 const navItems = [
   { label: 'About us', href: '#services' },
   { label: 'Portfolio', href: '#portfolio' },
-  { label: 'Stats', href: '#our-stats' },
+  { label: 'Assets', href: '#our-stats' },
+  { label: 'Templates', href: '#Templates' },
 ];
 
 const Navbar: React.FC = () => {
@@ -16,7 +17,7 @@ const Navbar: React.FC = () => {
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <div className="bg-white text-black font-extrabold px-2 py-0.5 text-lg">X</div>
-          <span className="font-bold tracking-widest text-white">METHOD</span>
+          <span className="font-bold tracking-widest text-white">A2TECH</span>
         </div>
 
         {/* Desktop Nav */}
