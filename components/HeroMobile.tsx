@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, PresentationControls, Environment, ContactShadows, Sparkles, Stars, PerformanceMonitor, TorusKnot } from '@react-three/drei';
+import { Float, PresentationControls, Environment, ContactShadows, Sparkles, Stars, PerformanceMonitor, Icosahedron } from '@react-three/drei';
 import * as THREE from 'three';
 
 const PALETTE = {
@@ -12,53 +12,59 @@ const PALETTE = {
   navy: '#171741',
   darkPurple: '#40244B',
   deepBlue: '#1255F1',
+  electricCyan: '#00FFFF'
 };
 
-// --- NEW: The "Neon Artifact" (Replaces the heavy glass cube) ---
-// This uses cheap standard materials but looks premium due to lighting and wireframe overlay.
-const NeonArtifact = ({ scale = 1 }: { scale?: number }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const wireframeRef = useRef<THREE.Mesh>(null);
+// --- NEW CENTRAL OBJECT: Geometric Data Artifact ---
+// Premium look achieved via layering metal and glowing wireframes. very low poly.
+const GeometricArtifact = ({ scale = 1 }: { scale?: number }) => {
+  const coreRef = useRef<THREE.Mesh>(null);
+  const cageRef = useRef<THREE.Mesh>(null);
+  const innerLightRef = useRef<THREE.PointLight>(null);
 
   useFrame((state) => {
       const t = state.clock.getElapsedTime();
-      if (meshRef.current && wireframeRef.current) {
-          // Slow, complex rotation
-          meshRef.current.rotation.x = t * 0.15;
-          meshRef.current.rotation.y = t * 0.1;
-          // Wireframe rotates slightly differently for a dynamic effect
-          wireframeRef.current.rotation.x = t * 0.15;
-          wireframeRef.current.rotation.y = t * 0.1;
-          wireframeRef.current.rotation.z = Math.sin(t * 0.5) * 0.1;
+      if (coreRef.current && cageRef.current && innerLightRef.current) {
+          // Core rotates slowly on multiple axes
+          coreRef.current.rotation.x = t * 0.2;
+          coreRef.current.rotation.y = t * 0.15;
+          
+          // Cage rotates faster and slightly off-axis for dynamic effect
+          cageRef.current.rotation.x = t * 0.25;
+          cageRef.current.rotation.z = -t * 0.1;
+          
+          // Subtle pulsing light
+          innerLightRef.current.intensity = 15 + Math.sin(t * 2) * 5;
       }
   });
 
   return (
     <group scale={scale}>
-      {/* 1. The Solid Core: Dark reflective metal */}
-      <TorusKnot ref={meshRef} args={[1, 0.3, 128, 16]}>
-         {/* MeshStandardMaterial is much cheaper than Transmission */}
+      {/* 1. The Solid Core: Dark, highly reflective faceted metal */}
+      {/* args=[radius, detail] -> detail=0 gives a sharp faceted jewel look */}
+      <Icosahedron ref={coreRef} args={[1, 0]}>
         <meshStandardMaterial 
-            color={PALETTE.deepViolet}
-            roughness={0.1} // Very smooth
-            metalness={0.8} // Highly metallic to reflect the neon lights
-            envMapIntensity={1}
+            color={PALETTE.deepBlue}
+            roughness={0.05} // Almost mirror-like finish
+            metalness={0.95} // Very metallic to catch environment reflections
+            envMapIntensity={1.5} // Boost reflections
+            flatShading={true} // Emphasize the facets
         />
-      </TorusKnot>
+      </Icosahedron>
 
-      {/* 2. The Glowing Wireframe Overlay */}
-      <TorusKnot ref={wireframeRef} args={[1.02, 0.32, 128, 16]}>
+      {/* 2. The Outer Cage: Glowing Neon Wireframe overlay */}
+      <Icosahedron ref={cageRef} args={[1.05, 1]} scale={1.1}>
         <meshBasicMaterial 
-            color={PALETTE.neonPink} // The main glow color
+            color={PALETTE.neonPink}
             wireframe={true}
             transparent
-            opacity={0.4}
-            toneMapped={false} // Makes the color sear bright
+            opacity={0.6}
+            toneMapped={false} // Ensures color is sear-bright neon
         />
-      </TorusKnot>
+      </Icosahedron>
       
-      {/* Inner light to make the center pop */}
-      <pointLight position={[0,0,0]} intensity={15} color={PALETTE.neonBlue} distance={3} />
+      {/* 3. Inner Core Light to make it radiate from within */}
+      <pointLight ref={innerLightRef} position={[0,0,0]} intensity={20} color={PALETTE.electricCyan} distance={4} decay={2} />
     </group>
   );
 };
@@ -67,13 +73,16 @@ const NeonArtifact = ({ scale = 1 }: { scale?: number }) => {
 const SimpleBackgroundMesh = () => {
     const ref = useRef<THREE.Mesh>(null);
     useFrame((state) => {
-        if(ref.current) ref.current.rotation.z = state.clock.elapsedTime * 0.01;
+        if(ref.current) {
+           ref.current.rotation.z = state.clock.elapsedTime * 0.02;
+           ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.1;
+        }
     });
+    // Using a torus knot wireframe in the far background looks more complex/premium than a sphere
     return (
-        <mesh ref={ref} position={[0, 0, -15]} scale={[2, 2, 2]}>
-            {/* Lowest detail geometry (detail = 0) */}
-            <icosahedronGeometry args={[10, 0]} /> 
-            <meshBasicMaterial color={PALETTE.deepBlue} wireframe transparent opacity={0.03} />
+        <mesh ref={ref} position={[0, 0, -20]} scale={[5, 5, 5]}>
+            <torusKnotGeometry args={[3, 0.1, 64, 8, 2, 3]} />
+            <meshBasicMaterial color={PALETTE.deepViolet} wireframe transparent opacity={0.05} />
         </mesh>
     );
 }
@@ -82,39 +91,36 @@ const SimpleBackgroundMesh = () => {
 // --- MAIN MOBILE COMPONENT ---
 
 const HeroMobile: React.FC = () => {
-  // Start at a lower DPR for mobile by default
   const [dpr, setDpr] = useState(1); 
 
   return (
     <div className="absolute inset-0 z-0 bg-[#030305]">
       <Canvas 
         dpr={dpr} 
-        // Wider FOV to make the object look grander on small screens
-        camera={{ position: [0, 0, 16], fov: 45 }} 
+        // Wider FOV makes the central object feel more imposing
+        camera={{ position: [0, 0, 15], fov: 50 }} 
         gl={{ 
-            antialias: false, // Disable AA for performance
+            antialias: false, 
             alpha: false,
             powerPreference: "high-performance",
-            stencil: false, // Disable stencil buffer
-            depth: true, // Keep depth buffer
+            stencil: false,
+            depth: true,
         }}
       >
-        {/* Aggressive performance monitoring for mobile */}
         <PerformanceMonitor onDecline={() => setDpr(0.75)} onIncline={() => setDpr(1.5)} />
         
         <color attach="background" args={['#030305']} />
-        {/* Use a cheaper, blurry environment map for reflections */}
+        {/* City preset gives great urban reflections on the metal core */}
         <Environment preset="city" blur={1} background={false} />
         
-        {/* Strong Rim Lights to hit the metallic surface */}
-        <spotLight position={[-10, 15, 10]} angle={0.5} intensity={80} color={PALETTE.neonBlue} />
-        <spotLight position={[10, -10, 10]} angle={0.5} intensity={80} color={PALETTE.neonPink} />
-        {/* Fill light */}
-        <pointLight position={[0, 5, -5]} intensity={20} color={PALETTE.royalPurple} />
+        {/* Dramatic Rim Lighting defines the edges of the facets */}
+        <spotLight position={[-12, 15, 10]} angle={0.3} intensity={100} color={PALETTE.neonBlue} penumbra={1} />
+        <spotLight position={[12, -10, 10]} angle={0.3} intensity={100} color={PALETTE.neonPink} penumbra={1} />
+        <pointLight position={[0, 5, -5]} intensity={10} color={PALETTE.royalPurple} />
 
-        {/* Significantly reduced particle counts */}
-        <Stars radius={80} depth={50} count={400} factor={4} saturation={0} fade speed={0.3} />
-        <Sparkles count={25} scale={10} size={4} speed={0.2} opacity={0.4} color={PALETTE.neonBlue} />
+        <Stars radius={80} depth={50} count={500} factor={4} saturation={0} fade speed={0.3} />
+        <Sparkles count={30} scale={15} size={4} speed={0.2} opacity={0.4} color={PALETTE.neonBlue} />
+        <Sparkles count={20} scale={15} size={2} speed={0.3} opacity={0.3} color={PALETTE.neonPink} />
         
         <SimpleBackgroundMesh />
 
@@ -122,21 +128,20 @@ const HeroMobile: React.FC = () => {
           global
           zoom={0.7}
           rotation={[0, 0, 0]}
-          polar={[-Math.PI / 8, Math.PI / 8]} // Limit vertical drag
-          azimuth={[-Math.PI / 8, Math.PI / 8]} // Limit horizontal drag
-          config={{ mass: 1, tension: 170, friction: 26 }} // Snappier feel
+          polar={[-Math.PI / 6, Math.PI / 6]}
+          azimuth={[-Math.PI / 6, Math.PI / 6]}
+          config={{ mass: 1, tension: 200, friction: 30 }}
           snap={true}
         >
-          <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-            <group position={[0, -0.5, 0]}>
-               {/* THE NEW OBJECT */}
-               <NeonArtifact scale={2.2} />
+          <Float speed={2.5} rotationIntensity={0.5} floatIntensity={0.8} floatingRange={[-0.2, 0.2]}>
+            <group position={[0, 0.5, 0]}>
+               {/* THE NEW GEOMETRIC ARTIFACT */}
+               <GeometricArtifact scale={2.5} />
             </group>
           </Float>
         </PresentationControls>
 
-        {/* Cheaper fake shadow */}
-        <ContactShadows position={[0, -4.5, 0]} opacity={0.6} scale={15} blur={2.5} far={4} color={PALETTE.deepBlue} frames={1} />
+        <ContactShadows position={[0, -4, 0]} opacity={0.7} scale={18} blur={2.5} far={5} color={PALETTE.deepBlue} frames={1} />
       </Canvas>
     </div>
   );
