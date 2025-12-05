@@ -19,7 +19,6 @@ const BismuthCore = ({ scale = 1 }: { scale?: number }) => {
       const t = state.clock.getElapsedTime();
       if (meshRef.current) {
           // Slow, hypnotic rotation
-          // Dodecahedrons look best when rotating on all 3 axes
           meshRef.current.rotation.x = t * 0.15;
           meshRef.current.rotation.y = t * 0.2;
           meshRef.current.rotation.z = Math.sin(t * 0.1) * 0.1;
@@ -33,26 +32,20 @@ const BismuthCore = ({ scale = 1 }: { scale?: number }) => {
       */}
       <Dodecahedron ref={meshRef} args={[1, 0]}>
         <meshPhysicalMaterial 
-            color={PALETTE.voidBlack} // Base color is jet black
-            
-            // THE TRICK: High metalness + High Iridescence
+            color={PALETTE.voidBlack} 
             metalness={1} 
-            roughness={0.1} // Slight blur to spread the colors
-            
-            // This creates the "Oil Slick" rainbow effect
+            roughness={0.1} 
             iridescence={1}
-            iridescenceIOR={2.2} // High index for strong color separation
+            iridescenceIOR={2.2} 
             iridescenceThicknessRange={[100, 800]}
-            
-            // Boosts the reflections of our colored lights
             envMapIntensity={1.5} 
-            flatShading={false} // Smooth shading makes the oil slick look liquid
+            flatShading={false} 
             clearcoat={1}
             clearcoatRoughness={0}
         />
       </Dodecahedron>
       
-      {/* Inner light to separate it from the background */}
+      {/* Inner light */}
       <pointLight position={[0,0,0]} intensity={2} color={PALETTE.deepBlue} distance={3} />
     </group>
   );
@@ -61,7 +54,6 @@ const BismuthCore = ({ scale = 1 }: { scale?: number }) => {
 // --- FLOATING SHARDS (Ambiance) ---
 const FloatingShards = () => {
     const count = 12;
-    // Pre-calculate random positions
     const shards = useMemo(() => {
         return new Array(count).fill(0).map(() => ({
             x: (Math.random() - 0.5) * 8,
@@ -84,7 +76,6 @@ const FloatingShards = () => {
             {shards.map((item, i) => (
                 <mesh key={i} position={[item.x, item.y, item.z]} rotation={[item.x, item.y, 0]}>
                     <octahedronGeometry args={[item.scale, 0]} />
-                    {/* These shards pick up the colored lights too */}
                     <meshStandardMaterial color="#333" metalness={0.8} roughness={0.2} />
                 </mesh>
             ))}
@@ -117,14 +108,7 @@ const HeroMobile: React.FC = () => {
         
         <color attach="background" args={['#030305']} />
         
-        {/* Environment: Studio (Black background with soft white reflections) */}
         <Environment preset="studio" resolution={256} blur={1} background={false} />
-        
-        {/* --- LIGHTING PAINTING --- 
-            We use 3 spotlights of different colors hitting the object from 
-            different sides. As the object rotates, its faces travel through 
-            these "color zones", constantly changing colors.
-        */}
         
         {/* 1. CYAN Light (Top Left) */}
         <spotLight 
@@ -144,7 +128,7 @@ const HeroMobile: React.FC = () => {
             penumbra={1} 
         />
         
-        {/* 3. GOLD Light (Back Rim) - Adds a premium edge highlight */}
+        {/* 3. GOLD Light (Back Rim) */}
         <spotLight 
             position={[0, 5, -10]} 
             angle={0.5} 
@@ -168,7 +152,8 @@ const HeroMobile: React.FC = () => {
         >
           <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5} floatingRange={[-0.2, 0.2]}>
             <group position={[0, 0, 0]}>
-               <BismuthCore scale={2.6} /> 
+               {/* REDUCED SCALE: 2.6 -> 2.1 (approx 20% smaller) */}
+               <BismuthCore scale={2.1} /> 
             </group>
           </Float>
         </PresentationControls>
