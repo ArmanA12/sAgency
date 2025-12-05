@@ -1,9 +1,8 @@
-import React, { useRef, useMemo, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, PresentationControls, Environment, RoundedBox, MeshTransmissionMaterial, ContactShadows, Sparkles, Stars } from '@react-three/drei';
+import { Float, PresentationControls, Environment, RoundedBox, MeshTransmissionMaterial, ContactShadows, Sparkles, Stars, PerformanceMonitor } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Exact requested palette
 const PALETTE = {
   navy: '#171741',
   deepViolet: '#211740',
@@ -26,7 +25,7 @@ const BackgroundWireframe = () => {
 
   return (
     <mesh ref={mesh} position={[0, 0, -10]} scale={[1.5, 1.5, 1.5]}>
-        <icosahedronGeometry args={[10, 2]} />
+        <icosahedronGeometry args={[10, 0]} />
         <meshBasicMaterial color={PALETTE.navy} wireframe transparent opacity={0.05} />
     </mesh>
   )
@@ -38,16 +37,15 @@ const CrystalCube = ({ position, rotation, coreColor, glassColor, rimColor, scal
   const lightRef = useRef<THREE.PointLight>(null);
   const [hovered, setHover] = useState(false);
 
+  const boxArgs: [number, number, number] = useMemo(() => [2.5, 2.5, 2.5], []);
+
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
-
     if (groupRef.current) {
-       // Premium floating rotation
        groupRef.current.rotation.x = rotation[0] + Math.sin(t * 0.2) * 0.05;
        groupRef.current.rotation.y = rotation[1] + t * 0.08;
     }
 
-    // Interactive Hover Animations
     if (materialRef.current) {
         const targetOpacity = hovered ? 0.8 : 0.2;
         materialRef.current.opacity = THREE.MathUtils.lerp(materialRef.current.opacity, targetOpacity, delta * 6);
@@ -65,16 +63,16 @@ const CrystalCube = ({ position, rotation, coreColor, glassColor, rimColor, scal
   return (
     <group position={position} ref={groupRef} scale={scale}>
       <RoundedBox 
-        args={[2.5, 2.5, 2.5]} 
+        args={boxArgs} 
         radius={0.05} 
-        smoothness={8} 
+        smoothness={4} 
         onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }}
         onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
       >
         <MeshTransmissionMaterial
             backside
-            samples={8}
-            resolution={1024}
+            samples={4} 
+            resolution={512} 
             thickness={2}
             chromaticAberration={1}
             anisotropy={1}
@@ -91,64 +89,65 @@ const CrystalCube = ({ position, rotation, coreColor, glassColor, rimColor, scal
             attenuationDistance={3}
             attenuationColor={coreColor}
             background={new THREE.Color('#030305')}
-            ior={2.4} // Diamond-like IOR
+            ior={2.4}
         />
       </RoundedBox>
       
-      {/* High-Tech Internal Grid */}
       <mesh scale={[0.99, 0.99, 0.99]}>
-         <boxGeometry args={[2.5, 2.5, 2.5]} />
+         <boxGeometry args={boxArgs} />
          <meshBasicMaterial ref={materialRef} color={rimColor} wireframe transparent opacity={0.2} />
       </mesh>
       
-      {/* Inner Glowing Core */}
       <pointLight ref={lightRef} position={[0, 0, 0]} intensity={40} color={coreColor} distance={5} decay={2} />
     </group>
   );
 };
 
 const Hero3D: React.FC = () => {
+  const [dpr, setDpr] = useState(1.5);
+
   return (
     <div className="absolute inset-0 z-0 bg-[#030305]">
       <Canvas 
-        dpr={[1, 2]} 
+        dpr={dpr} 
         camera={{ position: [0, 0, 16], fov: 30 }}
         gl={{ 
             toneMapping: THREE.ACESFilmicToneMapping, 
             toneMappingExposure: 1.8,
-            antialias: true,
-            alpha: false
+            antialias: false, 
+            alpha: false,
+            powerPreference: "high-performance"
         }}
       >
+        <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(2)} />
+
         <color attach="background" args={['#030305']} />
         
-        {/* High-End Studio Environment */}
         <Environment preset="night" blur={0.8} />
         
-        {/* Cinematic Rim Lights */}
-        <spotLight position={[-15, 15, 10]} angle={0.4} penumbra={1} intensity={50} color={PALETTE.neonBlue} castShadow />
-        <spotLight position={[15, -10, 10]} angle={0.4} penumbra={1} intensity={50} color={PALETTE.neonPink} castShadow />
+        <spotLight position={[-15, 15, 10]} angle={0.4} penumbra={1} intensity={50} color={PALETTE.neonBlue} />
+        <spotLight position={[15, -10, 10]} angle={0.4} penumbra={1} intensity={50} color={PALETTE.neonPink} />
         <pointLight position={[0, 10, 5]} intensity={10} color="white" />
 
-        {/* Atmosphere */}
-        <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={0.5} />
-        <Sparkles count={150} scale={12} size={3} speed={0.4} opacity={0.5} color={PALETTE.softPink} />
-        <Sparkles count={150} scale={12} size={2} speed={0.2} opacity={0.5} color={PALETTE.neonBlue} />
+        <Stars radius={100} depth={50} count={2000} factor={4} saturation={0} fade speed={0.5} />
+        <Sparkles count={100} scale={12} size={3} speed={0.4} opacity={0.5} color={PALETTE.softPink} />
+        <Sparkles count={100} scale={12} size={2} speed={0.2} opacity={0.5} color={PALETTE.neonBlue} />
         
-        {/* Background Depth Object */}
         <BackgroundWireframe />
 
+        {/* --- FIXED SECTION START --- */}
         <PresentationControls
           global
           zoom={0.8}
           rotation={[0, 0, 0]}
           polar={[-Math.PI / 16, Math.PI / 16]}
           azimuth={[-Math.PI / 16, Math.PI / 16]}
+          config={{ mass: 2, tension: 400 }}
+          snap={true}
         >
+        {/* --- FIXED SECTION END --- */}
           <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
-            {/* Moved group up to position cubes ~30% from bottom (-3.5 -> -1.5) */}
             <group position={[0, -1.5, 0]}>
-               {/* Left Cube: Tech Blue */}
                <CrystalCube 
                   position={[-4.5, 0, 0]} 
                   rotation={[0, Math.PI / 4, 0]} 
@@ -157,7 +156,6 @@ const Hero3D: React.FC = () => {
                   rimColor={PALETTE.neonBlue}
                />
                
-               {/* Center Cube: Premium Violet (Main) */}
                <CrystalCube
                   position={[0, 0, 0]}
                   rotation={[Math.PI / 8, Math.PI / 4, 0]}
@@ -167,7 +165,6 @@ const Hero3D: React.FC = () => {
                   scale={1.1}
                />
                
-               {/* Right Cube: Neon Pink */}
                <CrystalCube 
                   position={[4.5, 0, 0]} 
                   rotation={[0, -Math.PI / 4, 0]} 
@@ -179,7 +176,15 @@ const Hero3D: React.FC = () => {
           </Float>
         </PresentationControls>
 
-        <ContactShadows position={[0, -5, 0]} opacity={0.5} scale={40} blur={3} far={4} color={PALETTE.navy} />
+        <ContactShadows 
+            position={[0, -5, 0]} 
+            opacity={0.5} 
+            scale={40} 
+            blur={3} 
+            far={4} 
+            color={PALETTE.navy} 
+            frames={1} 
+        />
       </Canvas>
     </div>
   );
