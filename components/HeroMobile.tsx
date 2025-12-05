@@ -1,88 +1,91 @@
 import React, { useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, PresentationControls, Environment, ContactShadows, Stars, PerformanceMonitor, Octahedron } from '@react-three/drei';
+import { Float, PresentationControls, Environment, ContactShadows, Stars, PerformanceMonitor, Dodecahedron } from '@react-three/drei';
 import * as THREE from 'three';
 
 const PALETTE = {
-  voidBlack: '#080808',
-  neonCyan: '#00F0FF',
-  neonPurple: '#BD00FF',
+  voidBlack: '#000000', 
+  neonCyan: '#00F0FF',  
+  neonPink: '#FF0055', 
+  neonGold: '#FFD700',
   deepBlue: '#001eff',
 };
 
-// --- THE HOLOGRAPHIC GEM CORE ---
-// A single, solid Octahedron with an iridescent material.
-// No wireframes.
-const HyperCore = ({ scale = 1 }: { scale?: number }) => {
-  const diamondRef = useRef<THREE.Mesh>(null);
+// --- THE BISMUTH MONOLITH ---
+const BismuthCore = ({ scale = 1 }: { scale?: number }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
       const t = state.clock.getElapsedTime();
-      if (diamondRef.current) {
-          // Complex rotation to show off different facets catching the light
-          diamondRef.current.rotation.y = t * 0.3;
-          diamondRef.current.rotation.x = Math.cos(t * 0.2) * 0.2;
-          diamondRef.current.rotation.z = Math.sin(t * 0.1) * 0.1;
+      if (meshRef.current) {
+          // Slow, hypnotic rotation
+          // Dodecahedrons look best when rotating on all 3 axes
+          meshRef.current.rotation.x = t * 0.15;
+          meshRef.current.rotation.y = t * 0.2;
+          meshRef.current.rotation.z = Math.sin(t * 0.1) * 0.1;
       }
   });
 
   return (
     <group scale={scale}>
-      {/* THE GEMSTONE
-         We use an Octahedron with flat shading for the jewel look.
+      {/* THE GEOMETRY: Dodecahedron (12 faces) 
+          detail=0 keeps it sharp and faceted.
       */}
-      <Octahedron ref={diamondRef} args={[1, 0]}>
-        {/* meshPhysicalMaterial is slightly heavier than standard, 
-           but we removed all wireframes, so performance balances out.
-           Iridescence creates the colorful look cheaply.
-        */}
+      <Dodecahedron ref={meshRef} args={[1, 0]}>
         <meshPhysicalMaterial 
-            color={PALETTE.voidBlack} // A dark base color makes the rainbows pop
-            roughness={0.02}     // Extremely glossy, almost perfect mirror
-            metalness={0.9}      // Metallic base reflection
+            color={PALETTE.voidBlack} // Base color is jet black
             
-            iridescence={1}      // Enable the rainbow effect
-            iridescenceIOR={1.5} // Index of refraction for the rainbow film (diamond-like)
-            iridescenceThicknessRange={[100, 800]} // The range of colors generated
+            // THE TRICK: High metalness + High Iridescence
+            metalness={1} 
+            roughness={0.1} // Slight blur to spread the colors
             
-            envMapIntensity={2.5} // Boost environmental reflections
-            flatShading={true}    // CRITICAL: Ensures each face is a solid color
-            clearcoat={1}         // Adds an extra layer of polish
+            // This creates the "Oil Slick" rainbow effect
+            iridescence={1}
+            iridescenceIOR={2.2} // High index for strong color separation
+            iridescenceThicknessRange={[100, 800]}
+            
+            // Boosts the reflections of our colored lights
+            envMapIntensity={1.5} 
+            flatShading={false} // Smooth shading makes the oil slick look liquid
+            clearcoat={1}
+            clearcoatRoughness={0}
         />
-      </Octahedron>
+      </Dodecahedron>
       
-      {/* Internal light to give it a subtle glow from within */}
-      <pointLight position={[0,0,0]} intensity={5} color={PALETTE.neonPurple} distance={3} />
+      {/* Inner light to separate it from the background */}
+      <pointLight position={[0,0,0]} intensity={2} color={PALETTE.deepBlue} distance={3} />
     </group>
   );
 };
 
-// --- PARTICLE FIELD (Kept for ambiance) ---
-const DataParticles = () => {
-    const count = 20;
-    const positions = useMemo(() => {
+// --- FLOATING SHARDS (Ambiance) ---
+const FloatingShards = () => {
+    const count = 12;
+    // Pre-calculate random positions
+    const shards = useMemo(() => {
         return new Array(count).fill(0).map(() => ({
-            x: (Math.random() - 0.5) * 10,
-            y: (Math.random() - 0.5) * 10,
-            z: (Math.random() - 0.5) * 5,
-            scale: Math.random() * 0.05 + 0.02
+            x: (Math.random() - 0.5) * 8,
+            y: (Math.random() - 0.5) * 8,
+            z: (Math.random() - 0.5) * 4,
+            scale: Math.random() * 0.15 + 0.05,
+            speed: Math.random() * 0.2 + 0.1
         }));
     }, []);
 
     const group = useRef<THREE.Group>(null);
     useFrame((state) => {
         if (group.current) {
-            group.current.rotation.y = state.clock.elapsedTime * 0.05;
+            group.current.rotation.y = -state.clock.elapsedTime * 0.05;
         }
     })
 
     return (
         <group ref={group}>
-            {positions.map((pos, i) => (
-                <mesh key={i} position={[pos.x, pos.y, pos.z]}>
-                    {/* Using simple tetrahedrons for particles now, fits the theme better */}
-                    <tetrahedronGeometry args={[pos.scale, 0]} />
-                    <meshBasicMaterial color={i % 2 === 0 ? PALETTE.neonCyan : PALETTE.neonPurple} transparent opacity={0.5} />
+            {shards.map((item, i) => (
+                <mesh key={i} position={[item.x, item.y, item.z]} rotation={[item.x, item.y, 0]}>
+                    <octahedronGeometry args={[item.scale, 0]} />
+                    {/* These shards pick up the colored lights too */}
+                    <meshStandardMaterial color="#333" metalness={0.8} roughness={0.2} />
                 </mesh>
             ))}
         </group>
@@ -99,32 +102,60 @@ const HeroMobile: React.FC = () => {
     <div className="absolute inset-0 z-0 bg-[#030305]">
       <Canvas 
         dpr={dpr} 
-        camera={{ position: [0, 0, 14], fov: 45 }} 
+        camera={{ position: [0, 0, 13], fov: 45 }} 
         gl={{ 
             antialias: false, 
             alpha: false,
             powerPreference: "high-performance",
             stencil: false,
             depth: true,
-            // Tone mapping helps manage the bright iridescent colors
-            toneMapping: THREE.ACESFilmicToneMapping, 
-            toneMappingExposure: 1.2
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 1.0
         }}
       >
         <PerformanceMonitor onDecline={() => setDpr(0.75)} onIncline={() => setDpr(1.5)} />
         
         <color attach="background" args={['#030305']} />
         
-        {/* City preset provides sharp contrast for the gem reflections */}
-        <Environment preset="city" resolution={256} blur={0.8} background={false} />
+        {/* Environment: Studio (Black background with soft white reflections) */}
+        <Environment preset="studio" resolution={256} blur={1} background={false} />
         
-        {/* Lighting positioned to catch the flat faces as they turn */}
-        <spotLight position={[-10, 15, 10]} angle={0.3} intensity={60} color="white" penumbra={1} />
-        <spotLight position={[10, -10, 10]} angle={0.3} intensity={60} color="white" penumbra={1} />
+        {/* --- LIGHTING PAINTING --- 
+            We use 3 spotlights of different colors hitting the object from 
+            different sides. As the object rotates, its faces travel through 
+            these "color zones", constantly changing colors.
+        */}
         
-        <Stars radius={60} depth={40} count={400} factor={3} saturation={0} fade speed={0.5} />
+        {/* 1. CYAN Light (Top Left) */}
+        <spotLight 
+            position={[-10, 10, 10]} 
+            angle={0.4} 
+            intensity={80} 
+            color={PALETTE.neonCyan} 
+            penumbra={1} 
+        />
         
-        <DataParticles />
+        {/* 2. MAGENTA Light (Bottom Right) */}
+        <spotLight 
+            position={[10, -10, 10]} 
+            angle={0.4} 
+            intensity={80} 
+            color={PALETTE.neonPink} 
+            penumbra={1} 
+        />
+        
+        {/* 3. GOLD Light (Back Rim) - Adds a premium edge highlight */}
+        <spotLight 
+            position={[0, 5, -10]} 
+            angle={0.5} 
+            intensity={100} 
+            color={PALETTE.neonGold} 
+            penumbra={1} 
+        />
+        
+        <Stars radius={60} depth={40} count={300} factor={3} saturation={0} fade speed={0.5} />
+        
+        <FloatingShards />
 
         <PresentationControls
           global
@@ -137,7 +168,7 @@ const HeroMobile: React.FC = () => {
         >
           <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5} floatingRange={[-0.2, 0.2]}>
             <group position={[0, 0, 0]}>
-               <HyperCore scale={2.8} /> {/* Slightly larger now that it's alone */}
+               <BismuthCore scale={2.6} /> 
             </group>
           </Float>
         </PresentationControls>
